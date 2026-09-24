@@ -44,8 +44,11 @@ const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
   it('never pushes New Chat out of a narrow chat title bar', async () => {
     await resetInput('merhba');
+    // How many actions fit depends on the window size; VS Code must drop ours before New Chat.
     const actions = await visibleTitleActions();
-    assert.ok(actions.some(a => a.startsWith('New Chat')), `New Chat hidden: ${actions.join(' | ')}`);
+    const ours = actions.some(a => a.startsWith('Improve Prompt'));
+    const newChat = actions.some(a => a.startsWith('New Chat'));
+    assert.ok(!ours || newChat, `Improve Prompt shown while New Chat is hidden: ${actions.join(' | ')}`);
   });
 
   it('improves the prompt from the title bar and shows back/forward only when useful', async () => {
