@@ -45,7 +45,7 @@ export class PromptPen implements vscode.Disposable {
     const draft = doc.getText();
     if (!model || doc.isClosed || !draft.trim()) return;
 
-    const mode = modeOverride ?? config().get<Mode>('mode', 'fix');
+    const mode = modeOverride ?? config().get<Mode>('mode', 'expand');
     const language = config().get<OutputLanguage>('outputLanguage', 'same');
     const enhancer = new Enhancer(new LmTextModel(model));
     this.setRunning(true);

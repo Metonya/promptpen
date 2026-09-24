@@ -1,3 +1,4 @@
+import * as path from 'node:path';
 import * as vscode from 'vscode';
 import { ChatInputBridge } from './chatInput/ChatInputBridge';
 import { ContextCollector } from './context/ContextCollector';
@@ -10,17 +11,17 @@ import { StatusBar } from './ui/StatusBar';
 
 async function selectMode(): Promise<void> {
   const config = vscode.workspace.getConfiguration('promptpen');
-  const current = config.get<Mode>('mode', 'fix');
+  const current = config.get<Mode>('mode', 'expand');
   const items: (vscode.QuickPickItem & { mode: Mode })[] = [
-    {
-      mode: 'fix',
-      label: `${current === 'fix' ? '$(check) ' : ''}${vscode.l10n.t('Fix')}`,
-      detail: vscode.l10n.t('Fixes spelling, grammar and unclear wording; asks about contradictions. Adds nothing new.'),
-    },
     {
       mode: 'expand',
       label: `${current === 'expand' ? '$(check) ' : ''}${vscode.l10n.t('Expand')}`,
       detail: vscode.l10n.t('Also makes the prompt actionable with workspace context: files, expected outcome, acceptance criteria.'),
+    },
+    {
+      mode: 'fix',
+      label: `${current === 'fix' ? '$(check) ' : ''}${vscode.l10n.t('Fix')}`,
+      detail: vscode.l10n.t('Fixes spelling, grammar and unclear wording; asks about contradictions. Adds nothing new.'),
     },
   ];
   const choice = await vscode.window.showQuickPick(items, { title: vscode.l10n.t('PromptPen: Improvement mode') });
@@ -29,10 +30,10 @@ async function selectMode(): Promise<void> {
 
 async function showMenu(promptpen: PromptPen, models: ModelService): Promise<void> {
   const state = promptpen.versionState();
-  const model = await models.current();
+  const current = await models.current();
   const items: (vscode.QuickPickItem & { command?: string })[] = [
     { label: `$(sparkle) ${vscode.l10n.t('Improve Prompt')}`, command: 'promptpen.enhance' },
-    { label: `$(wand) ${vscode.l10n.t('Improve Prompt (Expand)')}`, command: 'promptpen.enhanceExpand' },
+    { label: `$(check-all) ${vscode.l10n.t('Fix Prompt Only')}`, command: 'promptpen.enhanceFix' },
   ];
   if (state?.total) {
     items.push({ label: '', kind: vscode.QuickPickItemKind.Separator });
@@ -44,7 +45,7 @@ async function showMenu(promptpen: PromptPen, models: ModelService): Promise<voi
     { label: '', kind: vscode.QuickPickItemKind.Separator },
     {
       label: `$(hubot) ${vscode.l10n.t('Select Model…')}`,
-      description: model?.name ?? vscode.l10n.t('not selected'),
+      description: current?.model.name ?? vscode.l10n.t('not selected'),
       command: 'promptpen.selectModel',
     },
     { label: `$(symbol-enum) ${vscode.l10n.t('Select Mode…')}`, command: 'promptpen.selectMode' },
@@ -56,7 +57,7 @@ async function showMenu(promptpen: PromptPen, models: ModelService): Promise<voi
 
 export function activate(context: vscode.ExtensionContext): void {
   const bridge = new ChatInputBridge();
-  const models = new ModelService();
+  const models = new ModelService(path.dirname(context.globalStorageUri.fsPath));
   const diff = new DiffView();
   const promptpen = new PromptPen(bridge, models, new ContextCollector(context.storageUri), diff);
   const register = (id: string, run: () => unknown) => vscode.commands.registerCommand(id, run);
@@ -68,7 +69,7 @@ export function activate(context: vscode.ExtensionContext): void {
     promptpen,
     new StatusBar(models),
     register('promptpen.enhance', () => promptpen.enhance()),
-    register('promptpen.enhanceExpand', () => promptpen.enhance('expand')),
+    register('promptpen.enhanceFix', () => promptpen.enhance('fix')),
     register('promptpen.previousVersion', () => promptpen.previous()),
     register('promptpen.nextVersion', () => promptpen.next()),
     register('promptpen.showDiff', () => promptpen.showDiff()),

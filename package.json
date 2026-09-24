@@ -2,7 +2,7 @@
   "name": "promptpen",
   "displayName": "%displayName%",
   "description": "%description%",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "metonya",
   "license": "MIT",
   "icon": "images/icon.png",
@@ -55,10 +55,10 @@
         "enablement": "!promptpen.running"
       },
       {
-        "command": "promptpen.enhanceExpand",
-        "title": "%command.enhanceExpand%",
+        "command": "promptpen.enhanceFix",
+        "title": "%command.enhanceFix%",
         "category": "PromptPen",
-        "icon": "$(wand)",
+        "icon": "$(check-all)",
         "enablement": "!promptpen.running"
       },
       {
@@ -178,7 +178,7 @@
             "%config.mode.fix%",
             "%config.mode.expand%"
           ],
-          "default": "fix",
+          "default": "expand",
           "description": "%config.mode%"
         },
         "promptpen.outputLanguage": {

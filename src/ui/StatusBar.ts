@@ -24,13 +24,16 @@ export class StatusBar implements vscode.Disposable {
       this.item.hide();
       return;
     }
-    const model = await this.models.current();
-    const mode = config.get<string>('mode', 'fix') === 'expand' ? vscode.l10n.t('Expand') : vscode.l10n.t('Fix');
+    const current = await this.models.current();
+    const model = current?.model;
+    const mode = config.get<string>('mode', 'expand') === 'fix' ? vscode.l10n.t('Fix') : vscode.l10n.t('Expand');
     this.item.text = `$(sparkle) ${model?.name ?? 'PromptPen'}`;
     this.item.tooltip = new vscode.MarkdownString(
       [
         '**PromptPen**',
-        vscode.l10n.t('Model: {0}', model?.name ?? vscode.l10n.t('not selected')),
+        current?.source === 'chat'
+          ? vscode.l10n.t('Model: {0} (follows the chat model)', current.model.name)
+          : vscode.l10n.t('Model: {0}', model?.name ?? vscode.l10n.t('not selected')),
         vscode.l10n.t('Mode: {0}', mode),
         '',
         vscode.l10n.t('Click for the PromptPen menu.'),

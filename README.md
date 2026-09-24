@@ -12,26 +12,26 @@ Fix typos, contradictions and unclear wording in the prompt you are about to sen
 
 Coding agents are sensitive to how a request is written. Controlled studies report that ambiguous, incomplete or contradictory task descriptions reduce code-generation pass rates by roughly 20–40% ([arXiv:2507.20439](https://arxiv.org/abs/2507.20439)), and that character-level typos hurt more than paraphrases ([arXiv:2506.10204](https://arxiv.org/abs/2506.10204)). Asking the developer about ambiguities before generating code measurably helps ([ClarifyGPT, FSE 2024](https://arxiv.org/abs/2310.10996)), and prompts rewritten by one model transfer to another ([Rephrase and Respond](https://arxiv.org/abs/2311.04205), [BPO, ACL 2024](https://arxiv.org/abs/2311.04155)). At the same time, heavily "engineered" prompts give little or nothing on modern reasoning models ([TOSEM 2025](https://arxiv.org/abs/2411.02093)).
 
-So PromptPen defaults to **minimal, intent-preserving edits** and **asks instead of guessing**.
+So PromptPen makes prompts actionable without inventing requirements, and **asks instead of guessing**; a Fix-only mode keeps edits minimal.
 
 ## Features
 
 - **✨ Improve Prompt** in the chat title bar, in the status bar menu and via `Ctrl+Alt+Shift+E` (`Cmd+Alt+Shift+E` on macOS) while the chat input has focus.
 - **Two modes**
-  - **Fix** (default): spelling, grammar, broken sentences; vague references are resolved only when the workspace makes them certain. Adds no new requirements.
-  - **Expand**: additionally names relevant files and symbols, states the expected outcome and acceptance criteria, and splits multi-part requests.
+  - **Expand** (default): fixes the wording, names relevant files and symbols, states the expected outcome and acceptance criteria, and splits multi-part requests. Adds no requirements you did not ask for.
+  - **Fix**: only spelling, grammar and broken sentences; vague references are resolved only when the workspace makes them certain. Available any time as **Fix Prompt Only**.
 - **Clarifying questions**: contradictions and ambiguities become multiple-choice questions; your answers are written into the prompt.
 - **Version history**: `←` / `→` buttons (or `Alt+PageUp` / `Alt+PageDown`) move between the original and every improved version. Text you type yourself is kept as its own version. `Ctrl+Z` works too.
 - **Compare with Original** opens a diff.
 - **Safe by construction**: `#file:` references, `@mentions`, `/commands`, URLs and code are verified to survive verbatim; if the model changes them, your prompt is left untouched.
-- **Your model**: any model in VS Code chat — GitHub Copilot's models or ones you added (Ollama, Anthropic, OpenAI, … via *Chat: Manage Language Models*). Small, fast models are usually enough.
+- **Your model**: by default the model selected in the chat view. Once you pick a model in PromptPen, it sticks. If the chat is set to *Auto* (which can route to large models), PromptPen asks once. Any model in VS Code chat works — GitHub Copilot's or ones you added (Ollama, Anthropic, OpenAI, … via *Chat: Manage Language Models*). Small, fast models are usually enough.
 - **Workspace context**: active file and selection, open files, problems, Git status and `AGENTS.md` / `CLAUDE.md` / `copilot-instructions.md`. Optionally the last turns of the current chat session.
 - English and Turkish UI.
 
 ## Usage
 
 1. Type a prompt in the chat input.
-2. Click **✨** in the chat title bar (or press `Ctrl+Alt+Shift+E`). The first time, pick a model; VS Code asks once whether PromptPen may use it.
+2. Click **✨** in the chat title bar (or press `Ctrl+Alt+Shift+E`). PromptPen uses the chat's model (or asks once if the chat is on *Auto*); VS Code asks once whether PromptPen may use it.
 3. Review the result. Use `←` to go back to your original, `→` to return, or answer the questions PromptPen asks.
 4. Send the prompt as usual.
 
@@ -41,8 +41,8 @@ So PromptPen defaults to **minimal, intent-preserving edits** and **asks instead
 
 | Setting | Default | Description |
 | --- | --- | --- |
-| `promptpen.model` | – | Model as `vendor/id`; use **PromptPen: Select Model…** |
-| `promptpen.mode` | `fix` | `fix` or `expand` |
+| `promptpen.model` | – | Model as `vendor/id`; empty follows the chat model. Use **PromptPen: Select Model…** |
+| `promptpen.mode` | `expand` | `expand` or `fix` |
 | `promptpen.outputLanguage` | `same` | `same` as the prompt, or `en` |
 | `promptpen.askQuestions` | `true` | Ask about contradictions and ambiguities |
 | `promptpen.context.workspace` | `true` | Send workspace context |
@@ -71,11 +71,11 @@ Press `F5` to start an Extension Development Host. There, **PromptPen: Run Eval 
 PromptPen, VS Code chat'e göndermek üzere olduğun promptu **chat kutusunun içinde** düzeltir: yazım hataları, çelişkiler ve anlatım bozuklukları. Hangi modelin kullanılacağını sen seçersin. Her sürüm saklanır, orijinaline her an dönebilirsin.
 
 - **✨ Promptu İyileştir**: chat başlık çubuğunda, durum çubuğu menüsünde veya chat kutusundayken `Ctrl+Alt+Shift+E`.
-- **Düzelt** modu (varsayılan) asgari düzeltme yapar, yeni gereksinim eklemez. **Geliştir** modu çalışma alanı bağlamıyla dosya ve sembol isimleri, beklenen sonuç ve kabul kriterleri ekler.
+- **Geliştir** modu (varsayılan) çalışma alanı bağlamıyla dosya ve sembol isimleri, beklenen sonuç ve kabul kriterleri ekler; istemediğin gereksinimi eklemez. **Sadece Düzelt** yalnızca yazım ve anlatım hatalarını düzeltir.
 - Çelişki ve belirsizlikler **çoktan seçmeli sorulara** dönüşür, cevapların prompta yazılır.
 - `←` / `→` (veya `Alt+PageUp` / `Alt+PageDown`) ile orijinal ve iyileştirilmiş sürümler arasında gezersin. Elle yazdıkların kaybolmaz, `Ctrl+Z` de çalışır.
 - `#file:` referansları, `@mention`'lar, `/komut`'lar, URL'ler ve kod aynen korunur. Model bunları bozarsa promptuna dokunulmaz.
-- Model olarak VS Code chat'teki herhangi bir model kullanılabilir: Copilot modelleri veya *Chat: Manage Language Models* ile eklediğin Ollama, Anthropic ve benzerleri. Küçük ve hızlı modeller genellikle yeterlidir.
+- Varsayılan olarak chat'te seçili model kullanılır. PromptPen'de bir kez model seçersen o kalır. Chat *Auto* modundaysa (büyük modellere yönlendirebilir) PromptPen bir kez sorar. Copilot modelleri veya *Chat: Manage Language Models* ile eklediğin Ollama, Anthropic ve benzerleri kullanılabilir; küçük ve hızlı modeller genellikle yeterlidir.
 - Sunucu yok, telemetri yok. Veri yalnızca seçtiğin modele gider.
 
 > **Buton neden mikrofonun yanında değil?** VS Code, eklentilerin chat kutusunun içine buton eklemesine henüz izin vermiyor. Kutunun içindeki tek açık menü (`chat/input/status`) şu an eklenti komutlarını çalıştırmıyor. Bu yüzden buton chat başlık çubuğunda. Kenar çubuğu darken VS Code butonu `⋯` menüsüne taşır; kısayol ve durum çubuğu menüsü her zaman çalışır.

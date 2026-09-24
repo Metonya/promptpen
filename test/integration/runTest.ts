@@ -24,6 +24,7 @@ async function main() {
     vscodeExecutablePath: localVSCode(),
     extensionDevelopmentPath: [root, path.join(root, 'test', 'fixtures', 'fake-lm')],
     extensionTestsPath: path.join(__dirname, 'suite', 'index.js'),
+    extensionTestsEnv: { PROMPTPEN_USER_DATA_DIR: userDataDir },
     launchArgs: [workspace, '--user-data-dir', userDataDir, '--disable-workspace-trust', '--disable-extensions', `--remote-debugging-port=${cdpPort}`],
   });
 }
