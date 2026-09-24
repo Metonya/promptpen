@@ -1,0 +1,257 @@
+{
+  "name": "promptpen",
+  "displayName": "%displayName%",
+  "description": "%description%",
+  "version": "0.1.0",
+  "publisher": "metonya",
+  "license": "MIT",
+  "icon": "images/icon.png",
+  "galleryBanner": {
+    "color": "#4F46E5",
+    "theme": "dark"
+  },
+  "keywords": [
+    "prompt",
+    "prompt enhancer",
+    "prompt engineering",
+    "copilot",
+    "copilot chat",
+    "github copilot",
+    "chat",
+    "ai",
+    "llm",
+    "typo",
+    "grammar",
+    "türkçe"
+  ],
+  "categories": [
+    "AI",
+    "Chat",
+    "Other"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Metonya/promptpen"
+  },
+  "bugs": {
+    "url": "https://github.com/Metonya/promptpen/issues"
+  },
+  "homepage": "https://github.com/Metonya/promptpen#readme",
+  "engines": {
+    "vscode": "^1.138.0"
+  },
+  "main": "./dist/extension.js",
+  "l10n": "./l10n",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "promptpen.enhance",
+        "title": "%command.enhance%",
+        "category": "PromptPen",
+        "icon": "$(sparkle)",
+        "enablement": "!promptpen.running"
+      },
+      {
+        "command": "promptpen.enhanceExpand",
+        "title": "%command.enhanceExpand%",
+        "category": "PromptPen",
+        "icon": "$(wand)",
+        "enablement": "!promptpen.running"
+      },
+      {
+        "command": "promptpen.previousVersion",
+        "title": "%command.previousVersion%",
+        "category": "PromptPen",
+        "icon": "$(arrow-left)"
+      },
+      {
+        "command": "promptpen.nextVersion",
+        "title": "%command.nextVersion%",
+        "category": "PromptPen",
+        "icon": "$(arrow-right)"
+      },
+      {
+        "command": "promptpen.showDiff",
+        "title": "%command.showDiff%",
+        "category": "PromptPen",
+        "icon": "$(diff)"
+      },
+      {
+        "command": "promptpen.selectModel",
+        "title": "%command.selectModel%",
+        "category": "PromptPen"
+      },
+      {
+        "command": "promptpen.selectMode",
+        "title": "%command.selectMode%",
+        "category": "PromptPen"
+      },
+      {
+        "command": "promptpen.showMenu",
+        "title": "%command.showMenu%",
+        "category": "PromptPen"
+      },
+      {
+        "command": "promptpen.openSettings",
+        "title": "%command.openSettings%",
+        "category": "PromptPen"
+      },
+      {
+        "command": "promptpen.runEval",
+        "title": "Run Eval (development)",
+        "category": "PromptPen"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "promptpen.previousVersion",
+          "when": "view == workbench.panel.chat.view.copilot && promptpen.canGoBack",
+          "group": "navigation@-4"
+        },
+        {
+          "command": "promptpen.enhance",
+          "when": "view == workbench.panel.chat.view.copilot",
+          "group": "navigation@-3"
+        },
+        {
+          "command": "promptpen.nextVersion",
+          "when": "view == workbench.panel.chat.view.copilot && promptpen.canGoForward",
+          "group": "navigation@-2"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "promptpen.previousVersion",
+          "when": "promptpen.canGoBack"
+        },
+        {
+          "command": "promptpen.nextVersion",
+          "when": "promptpen.canGoForward"
+        },
+        {
+          "command": "promptpen.showDiff",
+          "when": "promptpen.hasVersions"
+        },
+        {
+          "command": "promptpen.runEval",
+          "when": "promptpen.devMode"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "promptpen.enhance",
+        "key": "ctrl+alt+shift+e",
+        "mac": "cmd+alt+shift+e",
+        "when": "inChatInput"
+      },
+      {
+        "command": "promptpen.previousVersion",
+        "key": "alt+pageup",
+        "when": "inChatInput && promptpen.canGoBack"
+      },
+      {
+        "command": "promptpen.nextVersion",
+        "key": "alt+pagedown",
+        "when": "inChatInput && promptpen.canGoForward"
+      }
+    ],
+    "configuration": {
+      "title": "PromptPen",
+      "properties": {
+        "promptpen.model": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "%config.model%"
+        },
+        "promptpen.mode": {
+          "type": "string",
+          "enum": [
+            "fix",
+            "expand"
+          ],
+          "enumDescriptions": [
+            "%config.mode.fix%",
+            "%config.mode.expand%"
+          ],
+          "default": "fix",
+          "description": "%config.mode%"
+        },
+        "promptpen.outputLanguage": {
+          "type": "string",
+          "enum": [
+            "same",
+            "en"
+          ],
+          "enumDescriptions": [
+            "%config.outputLanguage.same%",
+            "%config.outputLanguage.en%"
+          ],
+          "default": "same",
+          "description": "%config.outputLanguage%"
+        },
+        "promptpen.askQuestions": {
+          "type": "boolean",
+          "default": true,
+          "description": "%config.askQuestions%"
+        },
+        "promptpen.context.workspace": {
+          "type": "boolean",
+          "default": true,
+          "description": "%config.context.workspace%"
+        },
+        "promptpen.context.chatHistory": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "%config.context.chatHistory%"
+        },
+        "promptpen.context.maxChars": {
+          "type": "number",
+          "default": 12000,
+          "minimum": 0,
+          "maximum": 100000,
+          "description": "%config.context.maxChars%"
+        },
+        "promptpen.showSummary": {
+          "type": "boolean",
+          "default": true,
+          "description": "%config.showSummary%"
+        },
+        "promptpen.statusBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "%config.statusBar%"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p test/integration/tsconfig.json",
+    "test:unit": "vitest run",
+    "pretest:integration": "node -e \"require('fs').rmSync('out-test',{recursive:true,force:true})\" && tsc -p test/integration/tsconfig.json && npm run build",
+    "test:integration": "node out-test/test/integration/runTest.js",
+    "test": "npm run test:unit && npm run test:integration",
+    "package": "vsce package --no-dependencies",
+    "vscode:prepublish": "node esbuild.mjs --production"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.20.4",
+    "@types/vscode": "^1.138.0",
+    "@vscode/l10n-dev": "^0.0.35",
+    "@vscode/test-electron": "^3.1.0",
+    "@vscode/vsce": "^4.0.0",
+    "esbuild": "^0.28.2",
+    "mocha": "^12.0.2",
+    "ovsx": "^1.2.0",
+    "playwright-core": "^1.63.0",
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.1"
+  }
+}
